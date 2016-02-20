@@ -6,9 +6,16 @@ import xml.etree.ElementTree as ET
 
 from downloader import Downloader
 
+def fixup_feed_xml(feed):
+    lines = feed.splitlines()
+    lines[1] = '<rss xmlns:dcterms="http://purl.org/dc/terms/" xmlns:arte="http://arte.fr/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">'
+    feed = '\n'.join(lines)
+    return feed
+
 def _get_download_url(url):
     ns = {'media': 'http://search.yahoo.com/mrss/'}
     feed = urllib2.urlopen("http://www.arte.tv/papi/tvguide-flow/feeds/videos/fr.xml?type=ARTE_PLUS_SEVEN&player=false").read()
+    feed = fixup_feed_xml(feed)
     root = ET.fromstring(feed)
     items = root.findall(".//item")
     for item in items:
@@ -20,6 +27,7 @@ def _get_download_url(url):
 def get_all_prg():
     ns = {'media': 'http://search.yahoo.com/mrss/'}
     feed = urllib2.urlopen("http://www.arte.tv/papi/tvguide-flow/feeds/videos/fr.xml?type=ARTE_PLUS_SEVEN&player=false").read()
+    feed = fixup_feed_xml(feed)
     root = ET.fromstring(feed)
     items = root.findall(".//item")
     res = []
